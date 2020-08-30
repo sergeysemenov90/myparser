@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import pprint
+import csv
 
 
 URL = 'https://spb.hh.ru/search/vacancy?area=2&fromSearchLine=true&st=searchVacancy&text=Python+junior&from=suggest_post'
@@ -9,6 +9,7 @@ HEADERS = {
     'Chrome/84.0.4147.86 YaBrowser/20.8.0.894 Yowser/2.5 Yptp/1.23 Safari/537.36',
     'accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,'
     'image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'}
+FILE = 'vacancies.csv'
 
 def get_html(url, params = None):
     r = requests.get(url, headers = HEADERS, params = params)
@@ -36,12 +37,20 @@ def get_content(html):
 
     return vacancies
 
+def save_file(items, path):
+    with open(path, 'w', newline = '') as file:
+        writer = csv.writer(file, delimiter = ';')
+        writer.writerow(['Вакансия', 'Ссылка', 'Компания', 'Зарплата'])
+        for item in items:
+            writer.writerow([item['title'], item['link'], item['employer'], item['salary']])
+
 
 def parse():
     html = get_html(URL)
     if html.status_code == 200:
         vacancies = get_content(html.text)
-        print(vacancies)
+        print(f'Получено {len(vacancies)} вакансий')
+        save_file(vacancies, FILE)
     else:
         print('Ошибка соединения с сайтом')
 
