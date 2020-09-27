@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import csv
 
 
-URL = 'https://spb.hh.ru/search/vacancy?area=2&fromSearchLine=true&st=searchVacancy&text=Python+junior&from=suggest_post'
+
 HEADERS = {
     'user-agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
     'Chrome/84.0.4147.86 YaBrowser/20.8.0.894 Yowser/2.5 Yptp/1.23 Safari/537.36',
@@ -16,6 +16,7 @@ def get_html(url, params = None):
     return r
 
 def get_content(html):
+    """Getting the required strings from html"""
     soup = BeautifulSoup(html, 'html.parser')
     items = soup.find_all('div', class_ = 'vacancy-serp-item')
 
@@ -38,6 +39,7 @@ def get_content(html):
     return vacancies
 
 def save_file(items, path):
+    """Saving data to csv file"""
     with open(path, 'w', newline = '') as file:
         writer = csv.writer(file, delimiter = ';')
         writer.writerow(['Вакансия', 'Ссылка', 'Компания', 'Зарплата'])
@@ -46,6 +48,7 @@ def save_file(items, path):
 
 
 def parse():
+    URL = input('Введите URL: ')
     html = get_html(URL)
     if html.status_code == 200:
         vacancies = get_content(html.text)
